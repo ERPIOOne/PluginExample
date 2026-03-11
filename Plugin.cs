@@ -19,7 +19,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
-
+// Example for .NET 4.8 and using C# 7.3
 namespace e1_pluginexample
 {
     public class Plugin : IgwPlugin1
