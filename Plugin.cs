@@ -1,28 +1,25 @@
-﻿using ERPIO.AppSDK.Shared.Enums;
-using ERPIO.AppSDK.Shared.Interfaces;
-using ERPIO.AppSDK.Shared.Models;
-using ERPIO.AppSDK.Shared.Plugins.Interfaces;
+﻿
+//using ERPIO.AppSDK.Shared.Enums;
+//using ERPIO.AppSDK.Shared.Interfaces;
+//using ERPIO.AppSDK.Shared.Models;
+//using ERPIO.AppSDK.Shared.Plugins.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
+
 // Example for .NET 4.8 and using C# 7.3
 namespace e1_pluginexample
 {
-    public class Plugin : IgwPlugin1
+    public class Plugin : ERPIO.AppSDK.Shared.Plugins.Interfaces.IgwPlugin1
     {
         public static HttpClient Client = new HttpClient();
 
@@ -69,11 +66,11 @@ namespace e1_pluginexample
 
         // this method should return a list of models that the plugin provides
         // mandatory from IgwPlugin1
-        public List<PluginProvider1> GetAvailableModels(IPluginHost IHost)
+        public List<ERPIO.AppSDK.Shared.Models.PluginProvider1> GetAvailableModels(ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
-            var pluginProviders = new List<PluginProvider1>();
+            var pluginProviders = new List<ERPIO.AppSDK.Shared.Models.PluginProvider1>();
 
-            PluginProvider1 sqlprovider = new PluginProvider1();
+            ERPIO.AppSDK.Shared.Models.PluginProvider1 sqlprovider = new ERPIO.AppSDK.Shared.Models.PluginProvider1();
             sqlprovider.PluginGIDModel = ProviderSQL.PluginGIDModel;
             sqlprovider.PubName = ProviderSQL.PubName;
             sqlprovider.SysName = ProviderSQL.SysName;
@@ -83,7 +80,7 @@ namespace e1_pluginexample
 
             pluginProviders.Add(sqlprovider);
 
-            PluginProvider1 wsprovider = new PluginProvider1();
+            ERPIO.AppSDK.Shared.Models.PluginProvider1 wsprovider = new ERPIO.AppSDK.Shared.Models.PluginProvider1();
             wsprovider.PluginGIDModel = ProviderWS.PluginGIDModel;
             wsprovider.PubName = ProviderWS.PubName;
             wsprovider.SysName = ProviderWS.SysName;
@@ -98,7 +95,7 @@ namespace e1_pluginexample
 
         // main method for getting data from the plugin, used in datasource, should return a DataSet with the data for the requested model
         // mandatory from IgwPlugin1
-        public DataSet GetDataTable(PluginRequest1 request, IPluginHost IHost)
+        public DataSet GetDataTable(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             DataSet pluginDataSet = new DataSet("DB");
             DataTable dt = null;
@@ -156,7 +153,7 @@ namespace e1_pluginexample
 
         // executed during gateway startup, use this method to initialize your plugin
         // mandatory from IgwPlugin1
-        public void RunPluginConfiguration(IPluginHost IHost)
+        public void RunPluginConfiguration(ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             // configuration for HttpClient() 1x for whole instance (https://stackoverflow.com/questions/52150004/httpclient-does-not-use-servicepointmanager-service-points), can be different according the version of .NET
             // check if really needed - this is not recommended to be used in general, but some web services might require specific settings, e.g. TLS 1.2 or ignoring certificate errors
@@ -179,7 +176,7 @@ namespace e1_pluginexample
 
         // destination for actions of type Datarepeater (pump) for batch processing
         // mandatory from IgwPlugin1
-        public void SetLargeDataTable(PluginRequest1 request, DataTable tab, IPluginHost IHost)
+        public void SetLargeDataTable(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, DataTable tab, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             // mapping of destination parameters (with @) to column caption, e.g..: "ParName": "@invoiceType", "ValName": "BookingName"
             foreach (DataColumn col in tab.Columns)
@@ -190,9 +187,9 @@ namespace e1_pluginexample
             {
                 try
                 {
-                    PluginRequest1 docRequest = new PluginRequest1();
-                    docRequest.Params = new ParamsObject1();
-                    docRequest.Params.Params = new List<EParams1>();
+                    ERPIO.AppSDK.Shared.Models.PluginRequest1 docRequest = new ERPIO.AppSDK.Shared.Models.PluginRequest1();
+                    docRequest.Params = new ERPIO.AppSDK.Shared.Models.ParamsObject1();
+                    docRequest.Params.Params = new List<ERPIO.AppSDK.Shared.Models.EParams1>();
                     docRequest.SQLcmd = request.SQLcmd;
 
                     for (int i = 0; i < row.ItemArray.Count(); i++)
@@ -200,7 +197,7 @@ namespace e1_pluginexample
                         object sValue = row[i] != null ? row[i] : null;
                         if (sValue != null)
                         {
-                            docRequest.Params.Params.Add(new EParams1()
+                            docRequest.Params.Params.Add(new ERPIO.AppSDK.Shared.Models.EParams1()
                             {
                                 ParName = string.IsNullOrEmpty(row.Table.Columns[i].Caption) ? row.Table.Columns[i].ColumnName : row.Table.Columns[i].Caption,
                                 Val = sValue
@@ -217,7 +214,7 @@ namespace e1_pluginexample
                             {
                                 if (!docRequest.Params.Params.Any(p => p.ParName == par.ParName))
                                 {
-                                    docRequest.Params.Params.Add(new EParams1()
+                                    docRequest.Params.Params.Add(new ERPIO.AppSDK.Shared.Models.EParams1()
                                     {
                                         ParName = par.ParName,
                                         Val = sValue
@@ -272,112 +269,112 @@ namespace e1_pluginexample
         public const string PubName = "ExampleModelSQL";
         public const string SysName = "e1_pluginexample_modelsql";
         public const string Description = "Example model using SQL for ERPIO One plugin";
-        public static ParamsObject1 AvailableParams = new ParamsObject1()
+        public static ERPIO.AppSDK.Shared.Models.ParamsObject1 AvailableParams = new ERPIO.AppSDK.Shared.Models.ParamsObject1()
         {
-            Params = new List<EParams1>()
+            Params = new List<ERPIO.AppSDK.Shared.Models.EParams1>()
             {
-                new EParams1()
+                new ERPIO.AppSDK.Shared.Models.EParams1()
                 {
                     ParName = ParamNameYear,
-                    DType = enDataType.Int
+                    DType = ERPIO.AppSDK.Shared.Enums.enDataType.Int
                 },
-                new EParams1()
+                new ERPIO.AppSDK.Shared.Models.EParams1()
                 {
                     ParName = ParamNameDepartment,
-                    DType = enDataType.String
+                    DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                 }
             }
         };
         public static Guid ActionNewGuid = Guid.Parse("CE069144-5FB2-4893-B8FE-22AF382DDFF6");
         public static Guid ActionEditGuid = Guid.Parse("54A9211C-49C9-4CFB-B37E-09CC590B4405");
         public static Guid ActionDeleteGuid = Guid.Parse("ED3B23E1-258B-47EE-98F0-5A45C2ECCA37");
-        public static List<PluginProvider1> AvailableActions = new List<PluginProvider1>()
+        public static List<ERPIO.AppSDK.Shared.Models.PluginProvider1> AvailableActions = new List<ERPIO.AppSDK.Shared.Models.PluginProvider1>()
         {
-            new PluginProvider1()
+            new ERPIO.AppSDK.Shared.Models.PluginProvider1()
             {
                 SysName = "NewRecord",
                 PubName = "New",
                 Description = "Creates a new record",
                 PluginGIDModel = ActionNewGuid,
-                AvailableParams = new ParamsObject1()
+                AvailableParams = new ERPIO.AppSDK.Shared.Models.ParamsObject1()
                 {
-                    Params = new List<EParams1>()
+                    Params = new List<ERPIO.AppSDK.Shared.Models.EParams1>()
                     {
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameAccountCode,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameDepartment,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameYear,
-                            DType = enDataType.Int
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.Int
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameAmount,
-                            DType = enDataType.Decimal
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.Decimal
                         }
                     }
                 }
             },
-            new PluginProvider1()
+            new ERPIO.AppSDK.Shared.Models.PluginProvider1()
             {
                 SysName = "EditRecord",
                 PubName = "Edit",
                 Description = "Edits a record",
                 PluginGIDModel = ActionEditGuid,
-                AvailableParams = new ParamsObject1()
+                AvailableParams = new ERPIO.AppSDK.Shared.Models.ParamsObject1()
                 {
-                    Params = new List<EParams1>()
+                    Params = new List<ERPIO.AppSDK.Shared.Models.EParams1>()
                     {
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameAccountCode,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameDepartment,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameYear,
-                            DType = enDataType.Int
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.Int
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameAmount,
-                            DType = enDataType.Decimal
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.Decimal
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameID,
-                            DType = enDataType.Int
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.Int
                         }
                     }
                 }
             },
-            new PluginProvider1()
+            new ERPIO.AppSDK.Shared.Models.PluginProvider1()
             {
                 SysName = "DeleteRecord",
                 PubName = "Delete",
                 Description = "Delete a new record",
                 PluginGIDModel = ActionDeleteGuid,
-                AvailableParams = new ParamsObject1()
+                AvailableParams = new ERPIO.AppSDK.Shared.Models.ParamsObject1()
                 {
-                    Params = new List<EParams1>()
+                    Params = new List<ERPIO.AppSDK.Shared.Models.EParams1>()
                     {
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameID,
-                            DType = enDataType.Int
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.Int
                         }
                     }
                 }
@@ -386,19 +383,19 @@ namespace e1_pluginexample
 
         public static string TableName = "p" + System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location) + "_Accounts";
 
-        public static void PrepareTable(IPluginHost IHost)
+        public static void PrepareTable(ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             try
             {
-                IHost.SQLData.ExecuteCommand(enSQLConnectionType.s_internal_sqlite, "CREATE TABLE IF NOT EXISTS " + TableName + " (id INTEGER PRIMARY KEY, accountCode TEXT NOT NULL, department TEXT NOT NULL, year INTEGER NOT NULL, amount NUMERIC NOT NULL)", new Dictionary<string, object>());
+                IHost.SQLData.ExecuteCommand(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_internal_sqlite, "CREATE TABLE IF NOT EXISTS " + TableName + " (id INTEGER PRIMARY KEY, accountCode TEXT NOT NULL, department TEXT NOT NULL, year INTEGER NOT NULL, amount NUMERIC NOT NULL)", new Dictionary<string, object>());
             }
-            catch (Exception ex)
+            catch
             {
                 return;
             }
         }
 
-        public static DataTable GetTable(PluginRequest1 request, IPluginHost IHost)
+        public static DataTable GetTable(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             request.SQLcmd = $"SELECT * FROM \"{TableName}\" WHERE Year = @Year AND Department = @Department";
 
@@ -411,19 +408,19 @@ namespace e1_pluginexample
             return Tools.ExecuteSelect(request, IHost);
         }
 
-        public static void Add(PluginRequest1 request, IPluginHost IHost)
+        public static void Add(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
-            IHost.SQLData.ExecuteCommand(enSQLConnectionType.s_internal_sqlite, "INSERT INTO " + TableName + " (accountCode, department, year, amount) VALUES (@AccountCode, @Department, @Year, @Amount)", request);
+            IHost.SQLData.ExecuteCommand(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_internal_sqlite, "INSERT INTO " + TableName + " (accountCode, department, year, amount) VALUES (@AccountCode, @Department, @Year, @Amount)", request);
         }
 
-        public static void Edit(PluginRequest1 request, IPluginHost IHost)
+        public static void Edit(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
-            IHost.SQLData.ExecuteCommand(enSQLConnectionType.s_internal_sqlite, "UPDATE " + TableName + " SET accountCode = @AccountCode, department = @Department, year = @Year, amount = @Amount WHERE id = @ID", request);
+            IHost.SQLData.ExecuteCommand(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_internal_sqlite, "UPDATE " + TableName + " SET accountCode = @AccountCode, department = @Department, year = @Year, amount = @Amount WHERE id = @ID", request);
         }
 
-        public static void Delete(PluginRequest1 request, IPluginHost IHost)
+        public static void Delete(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
-            IHost.SQLData.ExecuteCommand(enSQLConnectionType.s_internal_sqlite, "DELETE FROM " + TableName + " WHERE id = @ID", request);
+            IHost.SQLData.ExecuteCommand(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_internal_sqlite, "DELETE FROM " + TableName + " WHERE id = @ID", request);
         }
     }
 
@@ -441,69 +438,69 @@ namespace e1_pluginexample
         public const string PubName = "ExampleModelWS";
         public const string SysName = "e1_pluginexample_modelws";
         public const string Description = "Example model using web service for ERPIO One plugin";
-        public static ParamsObject1 AvailableParams = new ParamsObject1()
+        public static ERPIO.AppSDK.Shared.Models.ParamsObject1 AvailableParams = new ERPIO.AppSDK.Shared.Models.ParamsObject1()
         {
-            Params = new List<EParams1>()
+            Params = new List<ERPIO.AppSDK.Shared.Models.EParams1>()
             {
-                new EParams1()
+                new ERPIO.AppSDK.Shared.Models.EParams1()
                 {
                     ParName = ParamNameClientId,
-                    DType = enDataType.String
+                    DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                 },
-                new EParams1()
+                new ERPIO.AppSDK.Shared.Models.EParams1()
                 {
                     ParName = ParamNameClientSecret,
-                    DType = enDataType.String
+                    DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                 },
-                new EParams1()
+                new ERPIO.AppSDK.Shared.Models.EParams1()
                 {
                     ParName = ParamNameParticipantId,
-                    DType = enDataType.String
+                    DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                 }
             }
         };
         public static Guid ActionSendGuid = Guid.Parse("ACA9F20E-B3A5-43FD-84A4-1C78CDE002DC");
-        public static List<PluginProvider1> AvailableActions = new List<PluginProvider1>()
+        public static List<ERPIO.AppSDK.Shared.Models.PluginProvider1> AvailableActions = new List<ERPIO.AppSDK.Shared.Models.PluginProvider1>()
         {
-            new PluginProvider1()
+            new ERPIO.AppSDK.Shared.Models.PluginProvider1()
             {
                 SysName = "SendDocument",
                 PubName = "Send",
                 Description = "Sends a document",
                 PluginGIDModel = ActionSendGuid,
-                AvailableParams = new ParamsObject1()
+                AvailableParams = new ERPIO.AppSDK.Shared.Models.ParamsObject1()
                 {
-                    Params = new List<EParams1>()
+                    Params = new List<ERPIO.AppSDK.Shared.Models.EParams1>()
                     {
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameClientId,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameClientSecret,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameReceiverParticipantId,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameSenderParticipantId,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameDocumentId,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         },
-                        new EParams1()
+                        new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = ParamNameDocument,
-                            DType = enDataType.String
+                            DType = ERPIO.AppSDK.Shared.Enums.enDataType.String
                         }
                     }
                 }
@@ -554,7 +551,7 @@ namespace e1_pluginexample
             }
         }
 
-        public static DataTable GetTable(PluginRequest1 request, IPluginHost IHost)
+        public static DataTable GetTable(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             if (Tools.IsRequestSchemaOnly(request))
             {
@@ -595,7 +592,7 @@ namespace e1_pluginexample
             }
         }
 
-        public static void Send(PluginRequest1 request, IPluginHost IHost)
+        public static void Send(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             string clientId = Tools.GetParamByNameFromRequestAsString(request, ParamNameClientId);
             string clientSecret = Tools.GetParamByNameFromRequestAsString(request, ParamNameClientSecret);
@@ -764,7 +761,7 @@ namespace e1_pluginexample
         // if end user entered value in search input in UI, the search term is in request.Params.Params with ValName = "__whereany"
         // this method performs a case-insensitive search for the term in all columns of the datatable and returns only matching rows
         // if search term is empty or not provided, original datatable is returned, this method can be used in any plugin provider after getting the data
-        public static DataTable CustomSearch(PluginRequest1 request, DataTable dt)
+        public static DataTable CustomSearch(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, DataTable dt)
         {
             if (dt == null) return null;
 
@@ -811,33 +808,33 @@ namespace e1_pluginexample
 
         // for insert/update/delete operations, SQLcmd contains the command with parameters, e.g. "INSERT INTO MyTable (Col1, Col2) VALUES (@Val1, @Val2)", parameters are in request.Params.Params
         // possible to choose if command will be executed on gateway SQL connection (enSQLConnectionType.s_gw) or internal SQLite database (enSQLConnectionType.s_internal_sqlite) by setting parameter "__gwsqlinternal" in request.Params.Params
-        public static void ExecuteQuery(PluginRequest1 request, IPluginHost IHost)
+        public static void ExecuteQuery(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             if (!string.IsNullOrEmpty(request.SQLcmd) && request.SQLcmd.ToLower() != "none" && !Guid.TryParse(request.SQLcmd, out var tmpguid) && !request.SQLcmd.Contains(request.PluginGIDModel != null ? request.PluginGIDModel.ToString() : Guid.NewGuid().ToString()) && !request.SQLcmd.Contains(request.PluginGIDAction != null ? request.PluginGIDAction.ToString() : Guid.NewGuid().ToString()))
             {
                 if (request.Params.Params.Exists(p => p.ParName == "__gwsqlinternal"))
-                    IHost.SQLData.ExecuteCommand(enSQLConnectionType.s_internal_sqlite, request.SQLcmd, request);
+                    IHost.SQLData.ExecuteCommand(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_internal_sqlite, request.SQLcmd, request);
                 else
-                    IHost.SQLData.ExecuteCommand(enSQLConnectionType.s_gw, request.SQLcmd, request);
+                    IHost.SQLData.ExecuteCommand(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_gw, request.SQLcmd, request);
             }
         }
 
         // for insert/update operations, DataTable contains the data to be saved, SQLcmd contains the command with parameters, e.g. "INSERT INTO MyTable (Col1, Col2) VALUES (@Val1, @Val2)"
         // possible to choose if command will be executed on gateway SQL connection (enSQLConnectionType.s_gw) or internal SQLite database (enSQLConnectionType.s_internal_sqlite) by setting parameter "__gwsqlinternal" in request.Params.Params
-        public static void ExecuteSave(PluginRequest1 request, DataTable data, IPluginHost IHost)
+        public static void ExecuteSave(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, DataTable data, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             if (!string.IsNullOrEmpty(request.SQLcmd) && request.SQLcmd.ToLower() != "none" && !Guid.TryParse(request.SQLcmd, out var tmpguid) && !request.SQLcmd.Contains(request.PluginGIDModel != null ? request.PluginGIDModel.ToString() : Guid.NewGuid().ToString()) && !request.SQLcmd.Contains(request.PluginGIDAction != null ? request.PluginGIDAction.ToString() : Guid.NewGuid().ToString()))
             {
                 if (request.Params.Params.Exists(p => p.ParName == "__gwsqlinternal"))
-                    IHost.SQLData.Save(enSQLConnectionType.s_internal_sqlite, request.SQLcmd, data, request);
+                    IHost.SQLData.Save(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_internal_sqlite, request.SQLcmd, data, request);
                 else
-                    IHost.SQLData.Save(enSQLConnectionType.s_gw, request.SQLcmd, data, request);
+                    IHost.SQLData.Save(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_gw, request.SQLcmd, data, request);
             }
         }
 
         // for select operations, SQLcmd contains the command with parameters, e.g. "SELECT * FROM MyTable WHERE Col1 = @Val1", parameters are in request.Params.Params
         // possible to choose if command will be executed on gateway SQL connection (enSQLConnectionType.s_gw) or internal SQLite database (enSQLConnectionType.s_internal_sqlite) by setting parameter "__gwsqlinternal" in request.Params.Params
-        public static DataTable ExecuteSelect(PluginRequest1 request, IPluginHost IHost)
+        public static DataTable ExecuteSelect(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             if (!string.IsNullOrEmpty(request.SQLcmd)
                 && request.SQLcmd.ToLower() != "none"
@@ -848,9 +845,9 @@ namespace e1_pluginexample
                 DataSet result;
 
                 if (request.Params.Params.Exists(p => p.ParName == "__gwsqlinternal"))
-                    result = IHost.SQLData.Select(enSQLConnectionType.s_internal_sqlite, request.SQLcmd, request);
+                    result = IHost.SQLData.Select(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_internal_sqlite, request.SQLcmd, request);
                 else
-                    result = IHost.SQLData.Select(enSQLConnectionType.s_gw, request.SQLcmd, request);
+                    result = IHost.SQLData.Select(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_gw, request.SQLcmd, request);
 
                 if (result != null && result.Tables != null && result.Tables.Count > 0)
                     return result.Tables[0].Copy();
@@ -864,7 +861,7 @@ namespace e1_pluginexample
         }
 
         // helper methods to get parameter values from request.Params.Params by name with case-insensitive search, returns null if not found or in case of any error
-        public static object GetParamByNameFromRequest(PluginRequest1 request, string paramName)
+        public static object GetParamByNameFromRequest(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, string paramName)
         {
             try
             {
@@ -886,31 +883,31 @@ namespace e1_pluginexample
         }
 
         // helper methods to get parameter values from request.Params.Params by name with case-insensitive search and convert to specific type, returns null if not found or in case of any error or conversion failure
-        public static string GetParamByNameFromRequestAsString(PluginRequest1 request, string paramName)
+        public static string GetParamByNameFromRequestAsString(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, string paramName)
         {
             return Convert.ToString(GetParamByNameFromRequest(request, paramName));
         }
 
         // helper methods to get parameter values from request.Params.Params by name with case-insensitive search and convert to specific type, returns null if not found or in case of any error or conversion failure
-        public static int? GetParamByNameFromRequestAsInt(PluginRequest1 request, string paramName)
+        public static int? GetParamByNameFromRequestAsInt(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, string paramName)
         {
             return int.TryParse(GetParamByNameFromRequestAsString(request, paramName), out var r) ? r : (int?)null;
         }
 
         // helper methods to get parameter values from request.Params.Params by name with case-insensitive search and convert to specific type, returns null if not found or in case of any error or conversion failure
-        public static double? GetParamByNameFromRequestAsDouble(PluginRequest1 request, string paramName)
+        public static double? GetParamByNameFromRequestAsDouble(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, string paramName)
         {
             return double.TryParse(GetParamByNameFromRequestAsString(request, paramName), out var r) ? r : (double?)null;
         }
 
         // helper methods to get parameter values from request.Params.Params by name with case-insensitive search and convert to specific type, returns null if not found or in case of any error or conversion failure
-        public static bool? GetParamByNameFromRequestAsBool(PluginRequest1 request, string paramName)
+        public static bool? GetParamByNameFromRequestAsBool(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, string paramName)
         {
             return bool.TryParse(GetParamByNameFromRequestAsString(request, paramName), out var r) ? r : (bool?)null;
         }
 
         // helper method to set parameter value in request.Params.Params by name with case-insensitive search, if parameter with provided name is not found, it will be added to the list, returns modified request object
-        public static PluginRequest1 SetParamValue(PluginRequest1 request, string paramName, object paramValue, string valName = "__dummy", enDataType dType = enDataType.String)
+        public static ERPIO.AppSDK.Shared.Models.PluginRequest1 SetParamValue(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, string paramName, object paramValue, string valName = "__dummy", ERPIO.AppSDK.Shared.Enums.enDataType dType = ERPIO.AppSDK.Shared.Enums.enDataType.String)
         {
             try
             {
@@ -926,7 +923,7 @@ namespace e1_pluginexample
                     }
                     else
                     {
-                        request.Params.Params.Add(new EParams1()
+                        request.Params.Params.Add(new ERPIO.AppSDK.Shared.Models.EParams1()
                         {
                             ParName = paramName,
                             Val = paramValue,
@@ -944,14 +941,14 @@ namespace e1_pluginexample
         }
 
         // creates a demo datatable with some info about plugin and request parameters, can be used for testing purposes in any plugin provider
-        public static DataTable CreateDemoDataTable(IgwPlugin1 plugin, PluginRequest1 request)
+        public static DataTable CreateDemoDataTable(ERPIO.AppSDK.Shared.Plugins.Interfaces.IgwPlugin1 plugin, ERPIO.AppSDK.Shared.Models.PluginRequest1 request)
         {
             DataTable dt = new DataTable();
             dt.Columns.Add(new DataColumn("gidrow", typeof(Guid)));
             dt.Columns[0].Caption = "Row";
-            dt.Columns.Add(new DataColumn(nameof(IgwPlugin1.PluginName), typeof(string)));
-            dt.Columns.Add(new DataColumn(nameof(IgwPlugin1.PluginVersion), typeof(string)));
-            dt.Columns.Add(new DataColumn(nameof(IgwPlugin1.PluginDescription), typeof(string)));
+            dt.Columns.Add(new DataColumn(nameof(ERPIO.AppSDK.Shared.Plugins.Interfaces.IgwPlugin1.PluginName), typeof(string)));
+            dt.Columns.Add(new DataColumn(nameof(ERPIO.AppSDK.Shared.Plugins.Interfaces.IgwPlugin1.PluginVersion), typeof(string)));
+            dt.Columns.Add(new DataColumn(nameof(ERPIO.AppSDK.Shared.Plugins.Interfaces.IgwPlugin1.PluginDescription), typeof(string)));
             dt.Columns.Add(new DataColumn("DateSent", typeof(DateTime)));
 
             var row = dt.NewRow();
@@ -991,7 +988,7 @@ namespace e1_pluginexample
         }
 
         // helper method to check if request contains parameter with name "__schemaonly" which can be used to return only schema of the datatable without any data
-        public static bool IsRequestSchemaOnly(PluginRequest1 request)
+        public static bool IsRequestSchemaOnly(ERPIO.AppSDK.Shared.Models.PluginRequest1 request)
         {
             return request.Params.Params.Any(p => string.Equals(p.ParName, "__schemaonly", StringComparison.CurrentCultureIgnoreCase));
         }        
@@ -1009,19 +1006,19 @@ namespace e1_pluginexample
 
         public static string LogTableName = "p" + System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().Location) + "_Log";
 
-        public static void PrepareTable(IPluginHost IHost)
+        public static void PrepareTable(ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost)
         {
             try
             {
-                IHost.SQLData.ExecuteCommand(enSQLConnectionType.s_internal_sqlite, "CREATE TABLE IF NOT EXISTS " + LogTableName + " (id INTEGER PRIMARY KEY, created_date TEXT NOT NULL, method TEXT NOT NULL, location TEXT NOT NULL, type TEXT NOT NULL, message TEXT NOT NULL)", new Dictionary<string, object>());
+                IHost.SQLData.ExecuteCommand(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_internal_sqlite, "CREATE TABLE IF NOT EXISTS " + LogTableName + " (id INTEGER PRIMARY KEY, created_date TEXT NOT NULL, method TEXT NOT NULL, location TEXT NOT NULL, type TEXT NOT NULL, message TEXT NOT NULL)", new Dictionary<string, object>());
             }
-            catch (Exception ex)
+            catch
             {
                 return;
             }
         }
 
-        public static bool IsVerboseLog(PluginRequest1 request)
+        public static bool IsVerboseLog(ERPIO.AppSDK.Shared.Models.PluginRequest1 request)
         {
             string verboseLogStr = Tools.GetParamByNameFromRequestAsString(request, "@verboseLog");
             if (!string.IsNullOrEmpty(verboseLogStr) && (verboseLogStr == "1" || verboseLogStr.ToLower() == "true"))
@@ -1034,7 +1031,7 @@ namespace e1_pluginexample
             }
         }
 
-        public static void WriteLog(string MessageLocation, MessageType Type, string Message, IPluginHost IHost,
+        public static void WriteLog(string MessageLocation, MessageType Type, string Message, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost,
         [System.Runtime.CompilerServices.CallerMemberName] string SourceName = "",
         //[System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
         [System.Runtime.CompilerServices.CallerLineNumber] int SouceLineNumber = 0)
@@ -1054,16 +1051,16 @@ namespace e1_pluginexample
                     Parameters.Add("@type", Type.ToString());
                     Parameters.Add("@message", Regex.Replace(Message, @"\r\n?|\n", ""));
 
-                    IHost.SQLData.ExecuteCommand(enSQLConnectionType.s_internal_sqlite, "INSERT INTO " + LogTableName + " (created_date, method, location, type, message) VALUES (@createdDate, @method, @location, @type, IFNULL(@message, 'NULL'))", Parameters);
+                    IHost.SQLData.ExecuteCommand(ERPIO.AppSDK.Shared.Enums.enSQLConnectionType.s_internal_sqlite, "INSERT INTO " + LogTableName + " (created_date, method, location, type, message) VALUES (@createdDate, @method, @location, @type, IFNULL(@message, 'NULL'))", Parameters);
                 }
-                catch (Exception ex)
+                catch
                 {
                     return;
                 }
             }
         }
 
-        public static void WriteVerboseLog(PluginRequest1 request, string MessageLocation, MessageType Type, string Message, IPluginHost IHost,
+        public static void WriteVerboseLog(ERPIO.AppSDK.Shared.Models.PluginRequest1 request, string MessageLocation, MessageType Type, string Message, ERPIO.AppSDK.Shared.Interfaces.IPluginHost IHost,
         [System.Runtime.CompilerServices.CallerMemberName] string SourceName = "",
         //[System.Runtime.CompilerServices.CallerFilePath] string sourceFilePath = "",
         [System.Runtime.CompilerServices.CallerLineNumber] int SouceLineNumber = 0)
@@ -1095,7 +1092,7 @@ public enum enDataType
     Uknown = 999
 }
 
-public class EParams1
+public class ERPIO.AppSDK.Shared.Models.EParams1
 {
     public string ParName { get; set; }
 
